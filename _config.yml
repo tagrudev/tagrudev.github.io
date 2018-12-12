@@ -1,1 +1,43 @@
-theme: jekyll-theme-minimal
+name: Todor Grudev
+title: Todor Grudev
+description: Writing about stuff
+meta_description: "Todor Grudev thoughts and blogs"
+
+aboutPage: true
+
+markdown: kramdown
+highlighter: rouge
+
+plugins: [jekyll-paginate]
+paginate: 20
+domain_name: "https://tagrudev.com"
+google_analytics: "UA-XXXXXXXX-X"
+disqus: true
+disqus_shortname: "todor-grudev"
+
+# Details for the RSS feed generator
+url:            "https://tagrudev.com"
+author:         "Todor Grudev"
+authorTwitter:  "tagrudev"
+
+permalink:       /:year/:title/
+
+defaults:
+    -
+        scope:
+            path: "" # empty string for all files
+            type: pages
+        values:
+            layout: default
+    -
+        scope:
+            path: "" # empty string for all files
+            type: posts
+        values:
+            layout: post
+    -
+        scope:
+            path: ""
+            type: drafts
+        values:
+            layout: post
