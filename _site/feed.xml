@@ -7,6 +7,19 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>Outmuscle Me</title>
+        
+        
+          <description>&lt;p&gt;A couple of months ago I wrote &lt;a href=&quot;https://tagrudev.com/2019/the-art-of-push-ups/&quot; target=&quot;_blank&quot;&gt;The Art of Push Ups&lt;/a&gt;, in that blog post I presented a tool that I’ve developed in order to keep track of my training activities. Surprisingly it grew on its own, there are more than 30 active users, not that many, but enough to give me a push to develop it a little bit further.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Thu, 23 May 2019 08:00:00 +0300</pubDate>
+        <link>http://localhost:4000/2019/outmuscle-me/</link>
+        <guid isPermaLink="true">http://localhost:4000/2019/outmuscle-me/</guid>
+      </item>
+    
+      <item>
         <title>The Art of Push Ups</title>
         
         
