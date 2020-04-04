@@ -7,10 +7,23 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>Installing Extraterm on Ubuntu 19.10</title>
+        
+        
+          <description>&lt;p&gt;I recently purchased a desktop PC (mostly for gaming and audio editing), after several days of doing that I installed an Ubuntu dist and I am currently in the process of making it a dev machine as well. In this post I am going to talk about an alternative to default Ubuntu Terminal - Extraterm.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sat, 04 Apr 2020 08:00:00 +0300</pubDate>
+        <link>http://localhost:4000/2020/installing-extraterm-on-ubuntu-19/</link>
+        <guid isPermaLink="true">http://localhost:4000/2020/installing-extraterm-on-ubuntu-19/</guid>
+      </item>
+    
+      <item>
         <title>Sidekiq, systemd and Capistrano</title>
         
         
-          <description>&lt;p&gt;In this blog post I am going to write about my approach on deploying a &lt;code class=&quot;highlighter-rouge&quot;&gt;Ruby On Rails&lt;/code&gt; application and dealing with &lt;code class=&quot;highlighter-rouge&quot;&gt;Sidekiq&lt;/code&gt; (job scheduler written in &lt;code class=&quot;highlighter-rouge&quot;&gt;Ruby&lt;/code&gt;). This approach is probably suitable for a small/medium application like  &lt;a href=&quot;https://tagrudev.com/2019/outmuscle-me/&quot; target=&quot;_blank&quot;&gt;Todor Grudev - Outmuscle Me&lt;/a&gt;. I would not recommend following this for a project with a lot of usage, Outmuscle Me at the time of that post has 262 Users, so you can imagine the infrastructure is not really demanding.  Heavy operations like syncing activities with Garmin and Fitbit were actually the reasons I decided to rollout &lt;code class=&quot;highlighter-rouge&quot;&gt;Sidekiq&lt;/code&gt; in the first place.&lt;/p&gt;
+          <description>&lt;p&gt;In this blog post I am going to write about my approach on deploying a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Ruby On Rails&lt;/code&gt; application and dealing with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sidekiq&lt;/code&gt; (job scheduler written in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Ruby&lt;/code&gt;). This approach is probably suitable for a small/medium application like  &lt;a href=&quot;https://tagrudev.com/2019/outmuscle-me/&quot; target=&quot;_blank&quot;&gt;Todor Grudev - Outmuscle Me&lt;/a&gt;. I would not recommend following this for a project with a lot of usage, Outmuscle Me at the time of that post has 262 Users, so you can imagine the infrastructure is not really demanding.  Heavy operations like syncing activities with Garmin and Fitbit were actually the reasons I decided to rollout &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Sidekiq&lt;/code&gt; in the first place.&lt;/p&gt;
 
 </description>
         
