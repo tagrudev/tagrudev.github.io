@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>http://localhost:4000/2019/my-2019-challenge/</loc>
+<lastmod>2019-01-03T20:00:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/2019/the-art-of-push-ups/</loc>
+<lastmod>2019-03-03T20:00:00+02:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/2019/outmuscle-me/</loc>
+<lastmod>2019-05-23T08:00:00+03:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/2019/the-road-to-10-000-push-ups/</loc>
+<lastmod>2019-09-08T11:00:00+03:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/2019/sidekiq-systemd-and-capistrano/</loc>
+<lastmod>2019-10-10T08:10:00+03:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/2020/installing-extraterm-on-ubuntu-19/</loc>
+<lastmod>2020-04-04T08:00:00+03:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/about/</loc>
+</url>
+<url>
+<loc>http://localhost:4000/</loc>
+</url>
+</urlset>

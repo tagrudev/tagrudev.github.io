@@ -8,7 +8,13 @@ aboutPage: true
 markdown: kramdown
 highlighter: rouge
 
-plugins: [jekyll-paginate]
+plugins:
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-archives
+
 paginate: 20
 domain_name: "https://tagrudev.com"
 google_analytics: "UA-62903136-1"
