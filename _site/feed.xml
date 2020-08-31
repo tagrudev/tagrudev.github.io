@@ -7,6 +7,19 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>Change the default primary key type in Rails</title>
+        
+        
+          <description>&lt;p&gt;Rails had changed the default type of the primary key from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;int&lt;/code&gt; to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;big int&lt;/code&gt; when creating a new table - &lt;a href=&quot;https://github.com/rails/rails/pull/26266&quot; target=&quot;blank&quot;&gt;Change Default Primary Keys to BIGINT #26266&lt;/a&gt;, but unless you are working with a big set of records (bigger than 2^31) it’s a waste of resources.&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sat, 04 Apr 2020 08:00:00 +0300</pubDate>
+        <link>http://localhost:4000/2020/change-the-defaul-primary-key-type-in-rails/</link>
+        <guid isPermaLink="true">http://localhost:4000/2020/change-the-defaul-primary-key-type-in-rails/</guid>
+      </item>
+    
+      <item>
         <title>Installing Extraterm on Ubuntu 19.10</title>
         
         

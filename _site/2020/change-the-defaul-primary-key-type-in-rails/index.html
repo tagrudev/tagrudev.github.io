@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Todor Grudev - Change the default primary key type in Rails</title>
+  <link rel="shortcut icon" href="/assets/images/favicon.ico">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/syntax.css">
+  <link rel="alternate" type="application/rss+xml" title="My Blog" href="/feed.xml">
+  <link rel="stylesheet" href="/assets/css/highlight.css">
+  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Todor Grudev" />
+  <!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Change the default primary key type in Rails | Todor Grudev</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Change the default primary key type in Rails" />
+<meta name="author" content="Todor Grudev" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Rails had changed the default type of the primary key from int to big int when creating a new table - Change Default Primary Keys to BIGINT #26266, but unless you are working with a big set of records (bigger than 2^31) it’s a waste of resources." />
+<meta property="og:description" content="Rails had changed the default type of the primary key from int to big int when creating a new table - Change Default Primary Keys to BIGINT #26266, but unless you are working with a big set of records (bigger than 2^31) it’s a waste of resources." />
+<link rel="canonical" href="http://localhost:4000/2020/change-the-defaul-primary-key-type-in-rails/" />
+<meta property="og:url" content="http://localhost:4000/2020/change-the-defaul-primary-key-type-in-rails/" />
+<meta property="og:site_name" content="Todor Grudev" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-04-04T08:00:00+03:00" />
+<script type="application/ld+json">
+{"author":{"@type":"Person","name":"Todor Grudev"},"headline":"Change the default primary key type in Rails","dateModified":"2020-04-04T08:00:00+03:00","datePublished":"2020-04-04T08:00:00+03:00","url":"http://localhost:4000/2020/change-the-defaul-primary-key-type-in-rails/","description":"Rails had changed the default type of the primary key from int to big int when creating a new table - Change Default Primary Keys to BIGINT #26266, but unless you are working with a big set of records (bigger than 2^31) it’s a waste of resources.","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2020/change-the-defaul-primary-key-type-in-rails/"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+<body>
+
+  <nav class="main-nav">
+  <a href="/">Home</a>
+  <a href="/about">About me</a>
+  <a class="cta" href="/feed.xml">Subscribe</a>
+</nav>
+
+
+  
+
+  <section id="wrapper" class="">
+    <article class="post">
+    <header>
+        <h1>Change the default primary key type in Rails</h1>
+        <h2 class="headline">April 4, 2020</h2>
+    </header>
+    <section id="post-body">
+        <p>Rails had changed the default type of the primary key from <code class="language-plaintext highlighter-rouge">int</code> to <code class="language-plaintext highlighter-rouge">big int</code> when creating a new table - <a href="https://github.com/rails/rails/pull/26266" target="blank">Change Default Primary Keys to BIGINT #26266</a>, but unless you are working with a big set of records (bigger than 2^31) it’s a waste of resources.</p>
+
+<p>You can control that in your migration by passing <code class="language-plaintext highlighter-rouge">id: false</code> to the <code class="language-plaintext highlighter-rouge">create_table</code> method and then adding a <code class="language-plaintext highlighter-rouge">primary_key</code> column with you desired type ex:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">create_table</span> <span class="ss">:exercises</span><span class="p">,</span> <span class="ss">id: </span><span class="kp">false</span> <span class="k">do</span> <span class="o">|</span><span class="n">t</span><span class="o">|</span>
+    <span class="n">t</span><span class="p">.</span><span class="nf">primary_key</span> <span class="ss">:id</span><span class="p">,</span> <span class="ss">:serial</span>
+    <span class="o">...</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p>In this case we are going to replace the default <code class="language-plaintext highlighter-rouge">big int</code> with a <code class="language-plaintext highlighter-rouge">serial</code> which is PostgreSQL specific . Serial is the same as integer except that PostgreSQL will automatically generate and populate values into the SERIAL column. This is similar to AUTO_INCREMENT column in MySQL or AUTOINCREMENT column in SQLite.</p>
+
+
+    </section>
+</article>
+<footer id="post-meta" class="clearfix">
+    <a href="/">
+        <img class="avatar" src="/assets/images/profile.jpg">
+        <div>
+            <span class="dark">Todor Grudev</span>
+            <span>Writing about stuff</span>
+        </div>
+    </a>
+
+    <section id="sharing">
+        <a class="twitter" href="https://twitter.com/intent/tweet?text=https://tagrudev.com/2020/change-the-defaul-primary-key-type-in-rails/ - Change the default primary key type in Rails by @tagrudev"><span class="icon-twitter"> Tweet</span></a>
+
+    </section>
+</footer>
+
+<!-- Disqus comments -->
+
+    <div class="archive readmore">
+        <h3>Comments</h3>
+        <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'todor-grudev';
+        var disqus_developer = 0; // developer mode is on
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+    </div>
+
+
+<!-- Archive post list -->
+
+
+
+
+
+  </section>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/highlight.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-62903136-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+</body>
+</html>
+
+
+

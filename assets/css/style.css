@@ -634,3 +634,9 @@ h2.month {
 	.post h1 { font-size:24px; }
 	.post h2 { font-size:20px; }
 }
+
+.language-plaintext.highlighter-rouge {
+  padding: 2px 4px;
+  background-color: #e4e6e87a;
+  border-radius: 3px;
+}
