@@ -14,16 +14,16 @@
 
 </description>
         
-        <pubDate>Sat, 04 Apr 2020 08:00:00 +0300</pubDate>
+        <pubDate>Tue, 01 Sep 2020 08:00:00 +0300</pubDate>
         <link>http://localhost:4000/2020/change-the-defaul-primary-key-type-in-rails/</link>
         <guid isPermaLink="true">http://localhost:4000/2020/change-the-defaul-primary-key-type-in-rails/</guid>
       </item>
     
       <item>
-        <title>Installing Extraterm on Ubuntu 19.10</title>
+        <title>Installing Extraterm on Ubuntu 19.10 (Updated)</title>
         
         
-          <description>&lt;p&gt;I recently purchased a desktop PC (mostly for gaming and audio editing), after several days of doing that I installed an Ubuntu dist and I am currently in the process of making it a dev machine as well. In this post I am going to talk about an alternative to default Ubuntu Terminal - Extraterm.&lt;/p&gt;
+          <description>&lt;p&gt;** This is an updated version for Ubuntu 20.04 and extraterm 0.59.2 (current Date is 07.06.2021)&lt;/p&gt;
 
 </description>
         
