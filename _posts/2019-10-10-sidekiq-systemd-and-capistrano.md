@@ -1,6 +1,8 @@
 ---
 title:  "Sidekiq, systemd and Capistrano"
 date: 2019-10-10 08:10
+category: dev
+tags: [ruby, server]
 ---
 
 In this blog post I am going to write about my approach on deploying a `Ruby On Rails` application and dealing with `Sidekiq` (job scheduler written in `Ruby`). This approach is probably suitable for a small/medium application like  [Todor Grudev - Outmuscle Me](https://tagrudev.com/2019/outmuscle-me/){:target="_blank"}. I would not recommend following this for a project with a lot of usage, Outmuscle Me at the time of that post has 262 Users, so you can imagine the infrastructure is not really demanding.  Heavy operations like syncing activities with Garmin and Fitbit were actually the reasons I decided to rollout `Sidekiq` in the first place.

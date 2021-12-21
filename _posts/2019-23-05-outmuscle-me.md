@@ -1,6 +1,8 @@
 ---
 title:  "Outmuscle Me"
 date: 2019-05-23 08:00
+category: dev
+tags: [rails, ruby, projects]
 ---
 
 A couple of months ago I wrote [The Art of Push Ups](https://tagrudev.com/2019/the-art-of-push-ups/){:target="_blank"}, in that blog post I presented a tool that I've developed in order to keep track of my training activities. Surprisingly it grew on its own, there are more than 30 active users, not that many, but enough to give me a push to develop it a little bit further.

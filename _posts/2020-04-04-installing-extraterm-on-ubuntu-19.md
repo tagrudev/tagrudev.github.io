@@ -1,6 +1,8 @@
 ---
 title:  "Installing Extraterm on Ubuntu 19.10 (Updated)"
 date: 2020-04-04 08:00
+category: dev
+tags: [ubuntu, terminal]
 ---
 ** This is an updated version for Ubuntu 20.04 and extraterm 0.59.2 (current Date is 07.06.2021)
 

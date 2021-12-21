@@ -1,6 +1,8 @@
 ---
 title:  "The Art of Push Ups"
 date: 2019-03-03 20:00
+category: health
+tags: [fitness, health]
 ---
 
 *A push-up (or press-up) is a common calisthenics exercise beginning from the prone position, or the front leaning rest position. They are also a common form of punishment used in the military, school sport, or in some martial arts disciplines.*

@@ -1,6 +1,8 @@
 ---
-title:  "Change the default primary key type in Rails"
+title: "Change the default primary key type in Rails"
 date: 2020-09-01 08:00
+category: dev
+tags: [rails, ruby, web]
 ---
 
 Rails had changed the default type of the primary key from `int` to `big int` when creating a new table - [Change Default Primary Keys to BIGINT #26266](https://github.com/rails/rails/pull/26266){:target="blank"}, but unless you are working with a big set of records (bigger than 2^31) it's a waste of resources.

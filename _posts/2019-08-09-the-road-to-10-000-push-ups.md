@@ -1,6 +1,8 @@
 ---
 title:  "The Road to 10 000 push ups"
 date: 2019-09-08 11:00
+category: health
+tags: [fitness, health]
 ---
 
 In 2018 I started a physical challenge with a friend of mine, we decided to start doing 50 push ups a day as a way to get in shape, this quickly turned into something more serious and we invited a couple of friends to join. Being a web developer, it was not hard to build something that will keep track of our current progress and in 2019 the [Outmuscle Me](https://outmuscle.me){:target="_blank"} project was born. A lot more people liked the idea and joined our challenge, it evolved into 6 months of doing Push Ups, competing against each other, finding the motivation of doing exercises each day.
