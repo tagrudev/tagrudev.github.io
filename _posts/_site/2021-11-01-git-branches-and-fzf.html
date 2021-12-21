@@ -1,0 +1,8 @@
+<p>Recently, I had to clean up all my stale branches and since I am not really a big fan of a GUI tool for <code class="language-plaintext highlighter-rouge">git</code> I looked into an alternative ways of doing that. In my ruby work I am mostly using VIM as a text editor and <code class="language-plaintext highlighter-rouge">fzf</code> is always there to help searching and selecting files - so I was wondering whether it could actually do the same for the git branches (since you can pipe anything to the <code class="language-plaintext highlighter-rouge">fzf</code> search). Turns out a friend of mine had already figured it out (credit goes to @gmitrev):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git branch | fzf <span class="nt">-m</span> | xargs git branch <span class="nt">-d</span>
+</code></pre></div></div>
+
+<p>So, we pipe the output of <code class="language-plaintext highlighter-rouge">git branch</code> to <code class="language-plaintext highlighter-rouge">fzf</code> multi-select mode (you can mark lines with TAB or Shift-TAB for multiple lines), then we use <code class="language-plaintext highlighter-rouge">xargs</code> a great command that reads streams of data from standard input, then generates and executes command lines; meaning it can take output of a command and passes it as argument of another command (you can use <code class="language-plaintext highlighter-rouge">git branch -D</code> for branches that are not yet merged).</p>
+
+<p>Voilà! You can now manage your branches using <code class="language-plaintext highlighter-rouge">fzf</code>.</p>

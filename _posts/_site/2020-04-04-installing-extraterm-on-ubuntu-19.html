@@ -1,0 +1,49 @@
+<p>** This is an updated version for Ubuntu 20.04 and extraterm 0.59.2 (current Date is 07.06.2021)</p>
+
+<p>I recently purchased a desktop PC (mostly for gaming and audio editing), after several days of doing that I installed an Ubuntu dist and I am currently in the process of making it a dev machine as well. In this post I am going to talk about an alternative to default Ubuntu Terminal - Extraterm.</p>
+
+<p>I am missing the iTerm + zsh + oh-my-zsh combination from my Mac machine and I found out that Extraterm is a cool alternative to the setup I have on the other operating system.</p>
+
+<p>In order to install it you need to follow those several steps</p>
+
+<ul>
+  <li>Head to the <a href="https://extraterm.org/" target="blank">Extraterm official website</a></li>
+  <li>Go to the <a href="https://extraterm.org/guide.html#installation" target="blank">Installation Section</a></li>
+  <li>Download the zip file for Ubuntu on the github releases page. In my case I had to download the “extraterm-0.59.2-linux-x64.zip”</li>
+</ul>
+
+<p>Once I did that I decide to place the extracted files in ~/Applications folder. At that point in order to test whether the Extraterm is working you can</p>
+
+<ul>
+  <li>open a terminal</li>
+  <li>then navigate to the folder and run the application</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd ~/Applications/extraterm-0.59.2-linux-x64 &amp;&amp; ./extraterm
+</code></pre></div></div>
+
+<p><img src="/assets/images/extraterm.png" alt="" /></p>
+
+<p>You should be seeing the Extraterm running, the problem with this is that you need to go to the default Terminal and run it from there which is not the perfect user experience. I want to change two things, #1 the obvious “not going through the terminal” and #2 the use of the Ubuntu keyboard settings (Ctr + Alt + T) to run the Extraterm.</p>
+
+<p>To solve #1 you will need to copy the .desktop file to /usr/share/applications for any user to be able to use it (you will need administrator permissions) or to ~/.local/share/applications if you just want it to be available for one user. In my case I only have one user so let’s go for a local installation</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cp ~/Applications/extraterm-0.59.2-linux-x64/extraterm.desktop ~/.local/share/applications/.
+</code></pre></div></div>
+
+<p>Open it with a text editor and change the Exec directive to</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Exec=bash -c "~/Applications/extraterm-0.59.2-linux-x64/extraterm"
+</code></pre></div></div>
+
+<p>Save it and now you can try to search for Extraterm in your Quickfind. Now in order to solve #2 we need to edit some system cofigurations:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gsettings list-recursively | grep terminal
+</code></pre></div></div>
+
+<p>This one will list all of the terminal related configuration options and we need to change the default application for the desktop terminal</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gsettings set org.gnome.desktop.default-applications.terminal exec 'bash -c "~/Applications/extraterm-0.59.2-linux-x64/extraterm"'
+</code></pre></div></div>
+
+<p>Voalá!!! Everything should be setup and Ctr + Alt + T should open the Extraterm program. Head to the <a href="https://extraterm.org/guide.html" target="blank">official user guide</a> in order to see what else Extraterm is capable of.</p>

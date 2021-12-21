@@ -1,0 +1,89 @@
+<p>In this blog post I am going to write about my approach on deploying a <code class="language-plaintext highlighter-rouge">Ruby On Rails</code> application and dealing with <code class="language-plaintext highlighter-rouge">Sidekiq</code> (job scheduler written in <code class="language-plaintext highlighter-rouge">Ruby</code>). This approach is probably suitable for a small/medium application like  <a href="https://tagrudev.com/2019/outmuscle-me/" target="_blank">Todor Grudev - Outmuscle Me</a>. I would not recommend following this for a project with a lot of usage, Outmuscle Me at the time of that post has 262 Users, so you can imagine the infrastructure is not really demanding.  Heavy operations like syncing activities with Garmin and Fitbit were actually the reasons I decided to rollout <code class="language-plaintext highlighter-rouge">Sidekiq</code> in the first place.</p>
+
+<p>The current setup consists of  a single server that takes care of serving the <code class="language-plaintext highlighter-rouge">Rails</code> content, storing the database and running the <code class="language-plaintext highlighter-rouge">Sidekiq</code>. Yeah, I am aware that this is not a good idea, but yet again I am running a start up here :). Deploying the app with <code class="language-plaintext highlighter-rouge">Capistrano</code> (a tool for running scripts) and in order to run <code class="language-plaintext highlighter-rouge">Sidekiq</code> I am using <code class="language-plaintext highlighter-rouge">systemd</code>. If you are not familiar with <code class="language-plaintext highlighter-rouge">systemd</code>, here is how Wiki describes it:</p>
+
+<blockquote>
+  <p>The systemd software suite provides fundamental building blocks for a Linux operating system. It includes the systemd “System and Service Manager”, an init system used to bootstrap user space and manage user processes.</p>
+</blockquote>
+
+<p>Check <a href="https://hackernoon.com/a-brief-overview-and-history-of-systemd-the-linux-process-manager-ca508bee4a33" target="_blank">A brief overview and history of systemd — the Linux process manager - By</a> for more information, the important part of this sentence is that it manages user processes. In my case it will take care of keeping <code class="language-plaintext highlighter-rouge">Sidekiq</code> alive. It will also take care of stoping it gracefully. My server is running Ubuntu, things may vary based on the operating system (ex. the folder you put the service script in). I am also using <code class="language-plaintext highlighter-rouge">rbenv</code> to control the <code class="language-plaintext highlighter-rouge">Ruby</code> versions so you may need to change some paths in the configurations below. Another prerequisite is having a <code class="language-plaintext highlighter-rouge">deploy</code> user that <code class="language-plaintext highlighter-rouge">Capistrano</code> would use. I believe that if you are searching the internet and have reached this article you probably already know all those stuff, so let’s jump into the necessesary steps needed to do the magic:</p>
+
+<h3 id="step-1---create-a-service">Step 1 - Create a service</h3>
+
+<p>Add a new file in  <code class="language-plaintext highlighter-rouge">/lib/systemd/system</code> called <code class="language-plaintext highlighter-rouge">sidekiq.service</code>, content:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>Unit]
+<span class="nv">Description</span><span class="o">=</span>Outmuscle Me Production Sidekiq
+<span class="nv">After</span><span class="o">=</span>syslog.target network.target
+
+<span class="o">[</span>Service]
+<span class="nv">WorkingDirectory</span><span class="o">=</span>/data/apps/outmuscleme/current
+
+<span class="nv">User</span><span class="o">=</span>deploy
+<span class="nv">Group</span><span class="o">=</span>deploy
+
+<span class="nv">Environment</span><span class="o">=</span><span class="nv">RBENV_ROOT</span><span class="o">=</span>/usr/local/rbenv
+<span class="nv">EnvironmentFile</span><span class="o">=</span>/data/apps/outmuscleme/shared/.env
+
+<span class="nv">ExecStart</span><span class="o">=</span>/usr/local/rbenv/bin/rbenv <span class="nb">exec </span>bundle <span class="nb">exec </span>sidekiq <span class="nt">-e</span> production
+
+<span class="nv">RestartSec</span><span class="o">=</span>1
+<span class="nv">Restart</span><span class="o">=</span>on-failure
+
+<span class="nv">SyslogIdentifier</span><span class="o">=</span>sidekiq
+
+<span class="o">[</span>Install]
+<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+</code></pre></div></div>
+
+<h3 id="step-2---enable-the-service">Step 2 - Enable the service</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/bin/systemctl <span class="nb">enable </span>sidekiq
+</code></pre></div></div>
+
+<p>Here <code class="language-plaintext highlighter-rouge">systemctl</code>  is a command, which is the central management tool for controlling the init system.</p>
+
+<h3 id="step-3---allow-the-deploy-user-to-restart--kill">Step 3 - Allow the deploy user to restart / kill</h3>
+
+<p>As a root user type <code class="language-plaintext highlighter-rouge">visudo</code> it will open up the <code class="language-plaintext highlighter-rouge">vi</code> editor loaded with the current <code class="language-plaintext highlighter-rouge">/etc/sudoers</code> file, at the end of the file you can add the following (or preferably you can create a new file at <code class="language-plaintext highlighter-rouge">/etc/sudoers.d/sidekiq-users</code> and add it  there)</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>%deploy <span class="nv">ALL</span><span class="o">=</span> NOPASSWD: /bin/systemctl restart sidekiq
+%deploy <span class="nv">ALL</span><span class="o">=</span> NOPASSWD: /bin/systemctl <span class="nb">kill</span> <span class="nt">-s</span> TSTP sidekiq
+</code></pre></div></div>
+
+<h3 id="step-4---modify-capistranos-deploy-file-configdeployrb">Step 4 - Modify Capistrano’s deploy file (<code class="language-plaintext highlighter-rouge">config/deploy.rb</code>)</h3>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">set</span> <span class="ss">:sidekiq_service_name</span><span class="p">,</span> <span class="s2">"sidekiq"</span>
+
+<span class="n">namespace</span> <span class="ss">:sidekiq</span> <span class="k">do</span>
+  <span class="n">desc</span> <span class="s2">"Quiet sidekiq (stop fetching new tasks from Redis)"</span>
+  <span class="n">task</span> <span class="ss">:quiet</span> <span class="k">do</span>
+    <span class="n">on</span> <span class="n">roles</span><span class="p">(</span><span class="ss">:app</span><span class="p">)</span> <span class="k">do</span>
+      <span class="n">execute</span> <span class="ss">:sudo</span><span class="p">,</span> <span class="ss">:systemctl</span><span class="p">,</span> <span class="ss">:kill</span><span class="p">,</span> <span class="s2">"-s"</span><span class="p">,</span> <span class="s2">"TSTP"</span><span class="p">,</span> <span class="n">fetch</span><span class="p">(</span><span class="ss">:sidekiq_service_name</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+
+  <span class="n">desc</span> <span class="s2">"Restart sidekiq service"</span>
+  <span class="n">task</span> <span class="ss">:restart</span> <span class="k">do</span>
+    <span class="n">on</span> <span class="n">roles</span><span class="p">(</span><span class="ss">:app</span><span class="p">)</span> <span class="k">do</span>
+      <span class="n">execute</span> <span class="ss">:sudo</span><span class="p">,</span> <span class="ss">:systemctl</span><span class="p">,</span> <span class="ss">:restart</span><span class="p">,</span> <span class="n">fetch</span><span class="p">(</span><span class="ss">:sidekiq_service_name</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">after</span> <span class="s2">"deploy:starting"</span><span class="p">,</span> <span class="s2">"sidekiq:quiet"</span>
+<span class="n">after</span> <span class="s2">"deploy:published"</span><span class="p">,</span> <span class="s2">"sidekiq:restart"</span>
+</code></pre></div></div>
+
+<p>According to <code class="language-plaintext highlighter-rouge">Sidekiq</code> ‘s documentation - TSTP tells <code class="language-plaintext highlighter-rouge">Sidekiq</code> to “quiet” as it will be shutting down at some point in the near future. It will stop fetching new jobs but continue working on current jobs. TSTP + TERM guarantee shutdown within a time period. Best practice is to send TSTP at the start of a deploy and TERM at the end of a deploy. So as you can see we are doing the <code class="language-plaintext highlighter-rouge">quiet</code> operation at the starting of the deployment and the terminating / restarting at the publishing state. That’s it, as a final step verify that everything is running correctly.</p>
+
+<p>I would really appreciate some feedback and I would love to see how you’ve setup the background processing of you application, leave me a comment ;)</p>
+
+<p>Additional sources:
+<br />
+<a href="https://curationexperts.github.io/playbook/production/sidekiq_in_production.html">Sidekiq in Production | playbook</a>
+<br />
+<a href="https://github.com/mperham/sidekiq/wiki/Signals">Sidekiq’s signals</a>
+<br />
+<a href="https://github.com/mperham/sidekiq/blob/master/examples/systemd/sidekiq.service">Sidekiq’s service example</a></p>
+
