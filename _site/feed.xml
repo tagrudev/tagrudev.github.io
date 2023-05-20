@@ -7,6 +7,20 @@
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>Mimic the iOS phased release in Android</title>
+        
+        
+          <description>&lt;h2 id=&quot;wait-whats-a-phased-release&quot;&gt;Wait, what’s a phased release?&lt;/h2&gt;
+&lt;p&gt;A phased release, or rollout, is a process where an app update is released to customers in stages instead of all at once. This is useful in several ways:&lt;/p&gt;
+
+</description>
+        
+        <pubDate>Sat, 20 May 2023 13:52:00 +0300</pubDate>
+        <link>http://localhost:4000/2023/android-phased-release-automation/</link>
+        <guid isPermaLink="true">http://localhost:4000/2023/android-phased-release-automation/</guid>
+      </item>
+    
+      <item>
         <title>Git branches and fzf</title>
         
         

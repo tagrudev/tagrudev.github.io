@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Todor Grudev - Mimic the iOS phased release in Android</title>
+  <link rel="shortcut icon" href="/assets/images/favicon.ico">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="stylesheet" href="/assets/css/syntax.css">
+  <link rel="alternate" type="application/rss+xml" title="My Blog" href="/feed.xml">
+  <link rel="stylesheet" href="/assets/css/highlight.css">
+  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Todor Grudev" />
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Mimic the iOS phased release in Android | Todor Grudev</title>
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="Mimic the iOS phased release in Android" />
+<meta name="author" content="Todor Grudev" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Work in progress" />
+<meta property="og:description" content="Work in progress" />
+<link rel="canonical" href="http://localhost:4000/2023/android-phased-release-automation/" />
+<meta property="og:url" content="http://localhost:4000/2023/android-phased-release-automation/" />
+<meta property="og:site_name" content="Todor Grudev" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-05-20T13:52:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Mimic the iOS phased release in Android" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Todor Grudev"},"dateModified":"2023-05-20T13:52:00+03:00","datePublished":"2023-05-20T13:52:00+03:00","description":"Work in progress","headline":"Mimic the iOS phased release in Android","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2023/android-phased-release-automation/"},"url":"http://localhost:4000/2023/android-phased-release-automation/"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+<body>
+
+  <nav class="main-nav">
+  <a href="/">Home</a>
+  <a href="/about">About me</a>
+  <a class="cta" href="/feed.xml">Subscribe</a>
+</nav>
+
+
+  
+
+  <section id="wrapper" class="">
+    <article class="post">
+    <header>
+        <h1>Mimic the iOS phased release in Android</h1>
+        <h2 class="headline">May 20, 2023</h2>
+    </header>
+    <section id="post-body">
+        <h2 id="wait-whats-a-phased-release">Wait, what’s a phased release?</h2>
+<p>A phased release, or rollout, is a process where an app update is released to customers in stages instead of all at once. This is useful in several ways:</p>
+
+<ol>
+  <li>Gauge how customers respond to an app update and respond accordingly</li>
+  <li>Backend processes or infrastructure can be scaled intelligently as adoption ramps up
+If something very unexpected happens, the release can be paused for triage leaving only X% of customers affected instead of everyone</li>
+</ol>
+
+<p>While this feature is both available in the iOS and Android world, it’s not done automatically for the Androids…</p>
+
+<h2 id="how-the-app-store-ios-phased-releases-work">How the App Store (iOS) phased releases work?</h2>
+
+<p>When you enable a phased release in the App Store your app update is gradually released to customers with automatic updates turned on.</p>
+<table> <thead> <tr> <th style="text-align: left">Day</th> <th style="text-align: left">Release Percentage</th> </tr> </thead> <tbody> <tr> <td style="text-align: left">Day 1</td> <td style="text-align: left">1%</td> </tr> <tr> <td style="text-align: left">Day 2</td> <td style="text-align: left">2%</td> </tr> <tr> <td style="text-align: left">Day 3</td> <td style="text-align: left">5%</td> </tr> <tr> <td style="text-align: left">Day 4</td> <td style="text-align: left">10%</td> </tr> <tr> <td style="text-align: left">Day 5</td> <td style="text-align: left">20%</td> </tr> <tr> <td style="text-align: left">Day 6</td> <td style="text-align: left">50%</td> </tr> <tr> <td style="text-align: left">Day 7</td> <td style="text-align: left">100%</td> </tr> </tbody> </table>
+
+<p>This is handled by Apple automactically, meaning that you don’t have to login and update them manually every day, and that’s exactly the case for the Android Store. In order to address this problem we are going to use the following:</p>
+
+<ul>
+  <li><strong>#1</strong> Jenkins or whatever CI you’re using, we need something that can guarantee us that the script we are going to write is going to run every day (cronjob will do the same thing)</li>
+  <li><strong>#2</strong> A simple ruby script that will take care of checking what is the current stage of the release and updating it to the next one accordingly</li>
+</ul>
+
+<p>Here’s the ruby script I wrote in order to achieve <strong>#2</strong>, I am going to comment most of the lines so it’s obvious what’s happening</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="c1"># We need those 2 dependencies, you can install them by adding those</span>
+<span class="c1"># 2 lines in your Gemfile, and then running bundle install, google</span>
+<span class="c1"># auth is the dependency we need in order to authenticate and the apis</span>
+<span class="c1"># one is the client wrapper which will handle the update for us.</span>
+<span class="c1">#</span>
+<span class="c1"># gem 'googleauth'</span>
+<span class="c1"># gem 'google-apis-androidpublisher_v3', '~&gt; 0.3.0'</span>
+<span class="c1">#</span>
+
+<span class="nb">require</span> <span class="s1">'google/apis/androidpublisher_v3'</span>
+<span class="nb">require</span> <span class="s1">'googleauth'</span>
+
+<span class="k">class</span> <span class="nc">AndroidPublisherClient</span>
+  <span class="no">STATUS_COMPLETED</span> <span class="o">=</span> <span class="s1">'completed'</span>
+  <span class="no">STATUS_IN_PROGRESS</span> <span class="o">=</span> <span class="s1">'inProgress'</span>
+
+  <span class="c1"># CHANGE ME - this is your app package</span>
+  <span class="no">PACKAGE_NAME</span> <span class="o">=</span> <span class="s1">'com.mypackage.app'</span>
+  <span class="c1"># CHANGE ME - you can test this by changing the release stage</span>
+  <span class="no">RELEASE_STAGE</span> <span class="o">=</span> <span class="s1">'production'</span>
+  <span class="no">SCOPE</span> <span class="o">=</span> <span class="s1">'https://www.googleapis.com/auth/androidpublisher'</span>
+
+  <span class="no">Androidpublisher</span> <span class="o">=</span> <span class="no">Google</span><span class="o">::</span><span class="no">Apis</span><span class="o">::</span><span class="no">AndroidpublisherV3</span> <span class="c1"># just a reassign</span>
+
+  <span class="nb">attr_reader</span> <span class="ss">:percentage</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span>
+    <span class="vi">@publisher</span> <span class="o">=</span> <span class="no">Androidpublisher</span><span class="o">::</span><span class="no">AndroidPublisherService</span><span class="p">.</span><span class="nf">new</span>
+
+    <span class="c1"># There are several ways to do the authentication in here, head to</span>
+    <span class="c1"># https://github.com/googleapis/google-auth-library-ruby in order</span>
+    <span class="c1"># to check which one is the most appropriate for you</span>
+    <span class="vi">@authorizer</span> <span class="o">=</span>
+      <span class="no">Google</span><span class="o">::</span><span class="no">Auth</span><span class="o">::</span><span class="no">ServiceAccountCredentials</span><span class="p">.</span><span class="nf">make_creds</span><span class="p">(</span>
+        <span class="c1"># CHANGE ME based on the authentication strategy</span>
+        <span class="ss">json_key_io: </span><span class="no">File</span><span class="p">.</span><span class="nf">open</span><span class="p">(</span><span class="s1">'my_credential_file.json'</span><span class="p">),</span>
+        <span class="ss">scope: </span><span class="no">SCOPE</span><span class="p">,</span>
+      <span class="p">)</span>
+    <span class="vi">@publisher</span><span class="p">.</span><span class="nf">authorization</span> <span class="o">=</span> <span class="vi">@authorizer</span>
+    <span class="vi">@percentage</span> <span class="o">=</span> <span class="kp">nil</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">update_rollout</span>
+    <span class="c1"># Every update in the Android world is based on the "edit" notion,</span>
+    <span class="c1"># you create a new edit then access the track and update it, once</span>
+    <span class="c1"># you are ready you update and commit the change</span>
+    <span class="n">new_edit</span> <span class="o">=</span> <span class="vi">@publisher</span><span class="p">.</span><span class="nf">insert_edit</span> <span class="no">PACKAGE_NAME</span>
+    <span class="n">track</span> <span class="o">=</span> <span class="vi">@publisher</span><span class="p">.</span><span class="nf">get_edit_track</span> <span class="no">PACKAGE_NAME</span><span class="p">,</span> <span class="n">new_edit</span><span class="p">.</span><span class="nf">id</span><span class="p">,</span> <span class="no">RELEASE_STAGE</span>
+    <span class="n">release_in_progress</span> <span class="o">=</span> <span class="n">track</span><span class="p">.</span><span class="nf">releases</span><span class="p">.</span><span class="nf">find</span> <span class="p">{</span> <span class="o">|</span><span class="n">it</span><span class="o">|</span> <span class="n">it</span><span class="p">.</span><span class="nf">status</span> <span class="o">==</span> <span class="no">STATUS_IN_PROGRESS</span> <span class="p">}</span>
+
+    <span class="c1"># If we have release in progress, then check how much we need to</span>
+    <span class="c1"># bump up the version this is following the 7days approach of Apple</span>
+    <span class="k">if</span> <span class="n">release_in_progress</span>
+      <span class="vi">@percentage</span> <span class="o">=</span>
+        <span class="k">case</span> <span class="n">release_in_progress</span><span class="p">.</span><span class="nf">user_fraction</span>
+        <span class="k">when</span> <span class="mi">0</span> <span class="k">then</span> <span class="mf">0.01</span>
+        <span class="k">when</span> <span class="mf">0.01</span> <span class="k">then</span> <span class="mf">0.02</span>
+        <span class="k">when</span> <span class="mf">0.02</span> <span class="k">then</span> <span class="mf">0.05</span>
+        <span class="k">when</span> <span class="mf">0.05</span> <span class="k">then</span> <span class="mf">0.1</span>
+        <span class="k">when</span> <span class="mf">0.1</span> <span class="k">then</span> <span class="mf">0.2</span>
+        <span class="k">when</span> <span class="mf">0.2</span> <span class="k">then</span> <span class="mf">0.5</span>
+        <span class="k">when</span> <span class="mf">0.5</span> <span class="k">then</span> <span class="mi">1</span>
+        <span class="k">else</span>
+          <span class="k">raise</span> <span class="no">StandardError</span><span class="p">.</span><span class="nf">new</span> <span class="s1">'Percentage out of sync'</span>
+        <span class="k">end</span>
+
+      <span class="c1"># If this is the last step, close all the open release</span>
+      <span class="c1"># and compelete the current one</span>
+      <span class="k">if</span> <span class="vi">@percentage</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">release_in_progress</span><span class="p">.</span><span class="nf">update!</span> <span class="ss">user_fraction: </span><span class="kp">nil</span><span class="p">,</span> <span class="ss">status: </span><span class="no">STATUS_COMPLETED</span>
+
+        <span class="c1"># Deleted other version codes if completed because only allowed</span>
+        <span class="c1"># one completed version in a release</span>
+        <span class="n">track</span><span class="p">.</span><span class="nf">releases</span><span class="p">.</span><span class="nf">delete_if</span> <span class="p">{</span>
+          <span class="o">|</span><span class="n">r</span><span class="o">|</span> <span class="o">!</span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="nf">version_codes</span> <span class="o">||</span> <span class="p">[]).</span><span class="nf">map</span><span class="p">(</span><span class="o">&amp;</span><span class="ss">:to_s</span><span class="p">).</span><span class="nf">include?</span><span class="p">(</span><span class="n">release_in_progress</span><span class="p">.</span><span class="nf">version_codes</span><span class="p">.</span><span class="nf">first</span><span class="p">)</span>
+        <span class="p">}</span>
+      <span class="k">else</span>
+        <span class="n">release_in_progress</span><span class="p">.</span><span class="nf">update!</span> <span class="ss">user_fraction: </span><span class="vi">@percentage</span>
+      <span class="k">end</span>
+
+      <span class="c1"># so once we are ready we can update the edit track and commit it.</span>
+      <span class="vi">@publisher</span><span class="p">.</span><span class="nf">update_edit_track</span> <span class="no">PACKAGE_NAME</span><span class="p">,</span> <span class="n">new_edit</span><span class="p">.</span><span class="nf">id</span><span class="p">,</span> <span class="no">RELEASE_STAGE</span><span class="p">,</span> <span class="n">track</span>
+      <span class="vi">@publisher</span><span class="p">.</span><span class="nf">commit_edit</span> <span class="no">PACKAGE_NAME</span><span class="p">,</span> <span class="n">new_edit</span><span class="p">.</span><span class="nf">id</span>
+
+      <span class="nb">puts</span> <span class="s1">'+------+------------------+-------------+'</span>
+      <span class="nb">puts</span> <span class="s2">"|  Progress updated to: </span><span class="si">#{</span><span class="vi">@percentage</span><span class="si">}</span><span class="s2">%  |"</span>
+      <span class="nb">puts</span> <span class="s1">'+------+------------------+-------------+'</span>
+    <span class="k">else</span>
+      <span class="c1"># If there's no current release in progress,</span>
+      <span class="c1"># delete the current edit and display a message</span>
+      <span class="vi">@publisher</span><span class="p">.</span><span class="nf">delete_edit</span> <span class="no">PACKAGE_NAME</span><span class="p">,</span> <span class="n">new_edit</span><span class="p">.</span><span class="nf">id</span>
+      <span class="nb">puts</span> <span class="s1">'+------+------------------+-------------+'</span>
+      <span class="nb">puts</span> <span class="s2">"|    No current release in progress     |"</span>
+      <span class="nb">puts</span> <span class="s1">'+------+------------------+-------------+'</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span></code></pre></figure>
+
+<p>Once you have this script you can run it every day in your CI or a cronjob, using the following</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">publisher</span> <span class="o">=</span> <span class="no">AndroidPublisherClient</span><span class="p">.</span><span class="nf">new</span>
+  <span class="n">publisher</span><span class="p">.</span><span class="nf">update_rollout</span>
+</code></pre></div></div>
+
+<p>Let me know if that’s been helpful, leave a comment if you think I can improve the script.</p>
+
+<h2 id="usefull-links">Usefull links</h2>
+
+<p><a href="https://docs.departures.to/appstore/how-to-use-app-store-phased-releases">How to use App Store Phased Releases
+</a></p>
+
+<p><a href="https://github.com/googleapis/google-auth-library-ruby">Google Auth Library for Ruby
+</a></p>
+
+    </section>
+</article>
+<footer id="post-meta" class="clearfix">
+    <a href="/">
+        <img class="avatar" src="/assets/images/profile.jpg">
+        <div>
+            <span class="dark">Todor Grudev</span>
+            <span>Writing about stuff</span>
+        </div>
+    </a>
+
+    <section id="sharing">
+        <a class="twitter" href="https://twitter.com/intent/tweet?text=https://tagrudev.com/2023/android-phased-release-automation/ - Mimic the iOS phased release in Android by @tagrudev"><span class="icon-twitter"> Tweet</span></a>
+
+    </section>
+</footer>
+
+<!-- Disqus comments -->
+
+    <div class="archive readmore">
+        <h3>Comments</h3>
+        <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'todor-grudev';
+        var disqus_developer = 0; // developer mode is on
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+    </div>
+
+
+<!-- Archive post list -->
+
+
+
+
+
+  </section>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="/assets/js/main.js"></script>
+  <script src="/assets/js/highlight.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-62903136-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+</body>
+</html>
+
+
+
